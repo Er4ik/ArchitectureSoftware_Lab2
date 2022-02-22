@@ -38,16 +38,19 @@ class DoublyLinkedList {
 
     append(data) {
         const node = new Node(data, this.tail);
-
-        if (this.tail) {
-            this.tail.next = node;
-        }
+        let currentValue = this.head;
 
         if (!this.head) {
             this.head = node;
+            return;
         }
 
-        this.tail = node;
+        while (currentValue.next) {
+            currentValue = currentValue.next;
+        }
+
+        [currentValue.next, this.tail] = [node, node]
+        this.tail.previous = currentValue;
 
         return;
     }
@@ -59,13 +62,24 @@ class DoublyLinkedList {
             return;
         }
 
-        if (index === 0) {
-            const node = new Node(data, null, this.head);
+        if (index === 0 && this.length() === 1) {
+            this.tail = this.get(index);
+
+            const node = new Node(data, null, this.tail);
+
+            this.tail.previous = node;
             this.head = node;
 
             return;
         }
 
+        if (index === 0) {
+            const node = new Node(data, null, this.head);
+            [this.head, node.next.previous] = [node, node];
+
+            return;
+        }
+        console.log('test');
         const currentValue = this.get(index);
         const node = new Node(data, currentValue.previous, currentValue);
         [currentValue.previous.next, node.previous, node.next, node.next.previous] = [
@@ -83,13 +97,24 @@ class DoublyLinkedList {
 
         const value = this.get(index);
 
-        if (index === 0) {
+        if (index === 0 && this.length() === 1) {
+            [this.head, this.tail] = [null, null];
+
+            return value;
+        }
+
+        if (index === 0 && this.length() > 1) {
             [this.head, value.next.previous] = [value.next, null];
+
             return value;
         }
 
         if (index === this.length() - 1) {
-            [this.tail, value.previous.next] = [value.previous, null];
+            if(value.previous !== this.head) {
+                [this.tail, value.previous.next] = [value.previous, null];
+            } else {
+                [this.tail, value.previous.next] = [null, this.tail];
+            }
 
             return value;
         }
@@ -105,29 +130,37 @@ class DoublyLinkedList {
         let currentValue = this.head;
 
         for (let counter = 0; counter < this.length(); counter++) {
-            if (currentValue.data === element) {
-                currentValue = this.delete(counter);
-
-                currentValue = this.head;
-                counter = 0;
+            if (!this.length()) {
+                this.head = null;
+                this.tail = null;
+                return;
             }
 
-            currentValue = currentValue.next;
+            if (currentValue.data === element) {
+                this.delete(counter);
+                currentValue = this.head;
+                counter = -1;
+            } else currentValue = currentValue.next;
         }
 
         return;
     }
 
     clear() {
-        this.head.data = null;
-        this.tail.data = null;
-        [this.head.next, this.tail.previous] = [this.tail, this.head];
+        this.head = null;
+        this.tail = null;
 
         return;
     }
 
-    clone() {
-        return new DoublyLinkedList(this.head, this.tail);
+    clone(linkedList = this) {
+        const newLinkedList = new DoublyLinkedList();
+
+        for (let counter = 0; counter < linkedList.length(); counter++) {
+            newLinkedList.append(linkedList.get(counter).data);
+        }
+        
+        return newLinkedList;
     }
 
     reverse() {
@@ -176,13 +209,11 @@ class DoublyLinkedList {
 
     extend(linkedList) {
         if (!linkedList.head) return;
-        const newLinkedList = new DoublyLinkedList();
-
-        for(let counter = 0; counter < linkedList.length(); counter++) {
-            newLinkedList.append(linkedList.get(counter).data);
-        }
+        const newLinkedList = this.clone(linkedList);
 
         [this.tail.next, newLinkedList.head.previous, this.tail] = [newLinkedList.head, this.tail, newLinkedList.tail];
         return;
     }
 }
+
+module.exports = { DoublyLinkedList };
