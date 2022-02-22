@@ -7,12 +7,14 @@ class Node {
 }
 
 class DoublyLinkedList {
-    constructor() {
-        this.head = null;
-        this.tail = null;
+    constructor(head = null, tail = null) {
+        this.head = head;
+        this.tail = tail;
     }
 
     get(index) {
+        if (!this.head) return;
+
         let currentValue = this.head;
 
         for (let counter = 0; counter !== index; counter++) {
@@ -77,27 +79,44 @@ class DoublyLinkedList {
     }
 
     delete(index) {
+        if (!this.head) return;
+
         const value = this.get(index);
+
+        if (index === 0) {
+            [this.head, value.next.previous] = [value.next, null];
+            return value;
+        }
+
+        if (index === this.length() - 1) {
+            [this.tail, value.previous.next] = [value.previous, null];
+
+            return value;
+        }
 
         [value.previous.next, value.next.previous] = [value.next, value.previous];
 
         return value;
     }
 
-    // deleteAll(element) {
-    //     let currentValue = this.head;
+    deleteAll(element) {
+        if (!this.head) return;
 
-    //     for(let counter = 0; counter < this.length(); counter++) {
-            
-    //         this.delete(counter);
-            
-    //         currentValue = currentValue.next;
-    //     }
+        let currentValue = this.head;
 
-    //     [value.previous.next, value.next.previous] = [value.next, value.previous];
+        for (let counter = 0; counter < this.length(); counter++) {
+            if (currentValue.data === element) {
+                currentValue = this.delete(counter);
 
-    //     return value;
-    // }
+                currentValue = this.head;
+                counter = 0;
+            }
+
+            currentValue = currentValue.next;
+        }
+
+        return;
+    }
 
     clear() {
         this.head.data = null;
@@ -106,16 +125,64 @@ class DoublyLinkedList {
 
         return;
     }
+
+    clone() {
+        return new DoublyLinkedList(this.head, this.tail);
+    }
+
+    reverse() {
+        if (!this.head) return;
+
+        let currentValue = this.head;
+        while (currentValue) {
+            [currentValue.next, currentValue.previous] = [currentValue.previous, currentValue.next];
+            currentValue = currentValue.previous;
+        }
+
+        [this.head, this.tail] = [this.tail, this.head];
+
+        return;
+    }
+
+    findFirst(element) {
+        if (!this.head) return;
+
+        let currentValue = this.head;
+
+        if (!this.head) {
+            return -1;
+        }
+
+        for (let counter = 0; counter < this.length(); counter++) {
+            if (currentValue.data === element) return counter;
+            currentValue = currentValue.next;
+        }
+
+        return -1;
+    }
+
+    findLast(element) {
+        if (!this.head) return;
+
+        let currentValue = this.tail;
+
+        for (let counter = this.length() - 1; counter > 0; counter--) {
+            if (currentValue.data === element) return counter;
+            currentValue = currentValue.previous;
+        }
+
+        return -1;
+    }
+
+    extend(linkedList) {
+        if (!linkedList.head) return;
+        const newLinkedList = new DoublyLinkedList();
+
+        for(let counter = 0; counter < linkedList.length(); counter++) {
+            newLinkedList.append(linkedList.get(counter).data);
+        }
+
+        [this.tail.next, newLinkedList.head.previous, this.tail] = [newLinkedList.head, this.tail, newLinkedList.tail];
+        return;
+    }
 }
-
-const list = new DoublyLinkedList();
-
-list.append('Ervin');
-list.append("Osmanov");
-list.append("Nice");
-
-list.insert('hi', 1);
-
-// list.deleteAll('Ervin');
-
-console.log(list);
