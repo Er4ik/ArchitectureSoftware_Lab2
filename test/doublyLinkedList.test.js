@@ -111,7 +111,7 @@ describe("Doubly linked list", () => {
         list.extend(newList);
         newList.clear();
 
-        expect(list.length()).toEqual(4);
-        expect(list.findFirst("test1")).toEqual(2);
+        expect(list.length()).toEqual(3);
+        expect(list.findFirst("test1")).toEqual(1);
     });
 });
