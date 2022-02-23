@@ -243,7 +243,7 @@ class DoublyLinkedList {
 
             let currentValue = this.tail;
 
-            for (let counter = this.length() - 1; counter > 0; counter--) {
+            for (let counter = this.length() - 1; counter >= 0; counter--) {
                 if (currentValue.data === element) return counter;
                 currentValue = currentValue.previous;
             }
@@ -270,5 +270,13 @@ class DoublyLinkedList {
         }
     }
 }
+
+const list = new DoublyLinkedList;
+
+list.append('1')
+list.append("1")
+
+
+console.log(list.findLast('1'));
 
 module.exports = { DoublyLinkedList };
